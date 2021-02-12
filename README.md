@@ -4,7 +4,6 @@ A MATLAB package to read frames, timestamp and file header from [Norpix/StreamPi
 
 [MATLAB R2020b][MATLAB-url]
 
-
 ## Installation
 
 Add project folder to your MATLAB path.
