@@ -61,7 +61,10 @@ timestamp(nFrames,1) = "";
 %nSeconds = 0;
 
 while nread<nFrames
-    fseek(fid, SeqHeader.HeaderSize + (nread + frameRange(1)-1) * SeqHeader.TrueImageSize, 'bof');
+    frameNumber = nread + frameRange(1)-1;
+    frame_pos = SeqHeader.HeaderSize + ...
+        (frameNumber * SeqHeader.TrueImageSize);
+    fseek(fid,frame_pos,'bof');
     tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr]);
     
     % max(tmp(:))
