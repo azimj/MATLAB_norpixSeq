@@ -19,7 +19,7 @@ p.addRequired('seq_file_name',@isfile);
 p.addOptional('StartFrame',1,@isnumeric);
 p.addOptional('EndFrame',NaN,@isnumeric);
 p.addParameter('SeqHeader',struct.empty,@isstruct);
-p.addParameter('endianType','ieee-le',@(x)strcmpi(x,'ieee-le')|strcmpi(x,'ieee-be'));
+
 p.parse(varargin{:});
 
 % Extract parameters
@@ -27,7 +27,7 @@ seq_file_name = p.Results.seq_file_name;
 StartFrame = p.Results.StartFrame;
 EndFrame = p.Results.EndFrame;
 SeqHeader = p.Results.SeqHeader;
-endianType=p.Results.endianType;
+
 
 if isnan(EndFrame), EndFrame = StartFrame; end
 
@@ -44,8 +44,10 @@ switch SeqHeader.imageBitDepthReal
         error('myofiber:readNorpixSeqImage:wrongBitDepth',['Unsupported bit depth: ' num2str(SeqHeader.imageBitDepthReal)])
 end
 
+        
 
-fid = fopen(seq_file_name,'r',endianType);
+
+fid = fopen(seq_file_name,'r',SeqHeader.endianType);
 clnFCN = onCleanup(@()fclose(fid));
 frameRange = [StartFrame EndFrame];
 
@@ -70,8 +72,10 @@ while nread<nFrames
 
 
     switch SeqHeader.ImageFormat
-        case 'Monochrome'
+        case {'Monochrome', 'Mono_MSB_Swap'}
             tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr]);
+        
+            
         otherwise
             disp("Cannot read file: " + seq_file_name);
             error('readNorpixSeqImage:UnknownFormat', ...

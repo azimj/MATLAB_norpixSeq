@@ -2,6 +2,9 @@ function headerInfo = readNorpixSeqHeader(varargin)
 % NorpixSeqHeader
 % Retreive header information from a Norpix image sequence (*.seq) 
 %  
+% NorPix file format can be "found in the StreamPix Help menu, under the
+% Sequence File Format manual" 
+% see: https://www.norpix.com/support/faq.php#matlab
 
 % Adapted from Norpix2MATLAB 
 % Originally written 04/08/08 
@@ -10,13 +13,16 @@ function headerInfo = readNorpixSeqHeader(varargin)
 % Azim Jinha <ajinha@ucalgary.ca>
 % 18 March 2013
 %
-% 22 Nov 2017:
+% 22 Nov 2017: <Azim>
 %    Norpix file formats>5 have a different header size. Updated to reflect
 %    the change in header size.
 
-% 20 April 2020:
+
+% 20 April 2020:<Azim>
 %    Updating to work in a MATLAB +package folder
 %    Added input parsing
+% 4 June 2021 <Azim>
+%   * added endianType (ieee-le for most except Mono_MSB_Swap (114)
 
 % Header byte description offset,bytes,type
 OFB.Version = {28,1,'long'};
@@ -56,8 +62,8 @@ if  headerInfo.Version >=5
     headerInfo.HeaderSize = 8192;
 end
 % Some post processing for image format
-vals = [0,100,101,200:100:900];
-fmts = {'Unknown','Monochrome','Raw Bayer','BGR','Planar','RGB',...
+vals = [0,100,114,101,200:100:900];
+fmts = {'Unknown','Monochrome','Mono_MSB_Swap','Raw Bayer','BGR','Planar','RGB',...
     'BGRx', 'YUV422', 'UVY422', 'UVY411', 'UVY444'};
 fmt_idx = vals == headerInfo.imageFormatNumber;
 if ~any(fmt_idx)
@@ -71,6 +77,21 @@ if headerInfo.DescriptionFormat == 0 % Unicode
 elseif headerInfo.DescriptionFormat == 1 % ASCII
     headerInfo.Description = char(headerInfo.Description);
 end
+
+%% Set Endian type. 
+% all images are little endian except 'Mono_MSB_Swap (114)
+% See documentation:
+%        The NorPix Sequence File Format (.seq) - NorPix (c) 2013
+%        File: https://www.norpix.com/support/faq.php#matlab for more
+%         
+%
+switch headerInfo.ImageFormat
+    case 'Mono_MSB_Swap'
+        headerInfo.endianType = 'ieee-be';
+    otherwise
+        headerInfo.endianType = 'ieee-le';
+end
+
 
 end
 
