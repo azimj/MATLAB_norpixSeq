@@ -59,12 +59,11 @@ end
 vals = [0,100,101,200:100:900];
 fmts = {'Unknown','Monochrome','Raw Bayer','BGR','Planar','RGB',...
     'BGRx', 'YUV422', 'UVY422', 'UVY411', 'UVY444'};
-flg_format = vals == headerInfo.imageFormatNumber;
-
-headerInfo.ImageFormat = 'Unknown';
-if any(flg_format)
-    headerInfo.imageFormat = fmts{flg_format};
+fmt_idx = vals == headerInfo.imageFormatNumber;
+if ~any(fmt_idx)
+    fmt_idx = 1; % select 'Uknown'
 end
+headerInfo.ImageFormat = fmts{fmt_idx};
 
 % post processing to extract description
 if headerInfo.DescriptionFormat == 0 % Unicode

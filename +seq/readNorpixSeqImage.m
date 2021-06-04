@@ -61,12 +61,24 @@ timestamp(nFrames,1) = "";
 %nSeconds = 0;
 
 while nread<nFrames
+
     frameNumber = nread + frameRange(1)-1;
     frame_pos = SeqHeader.HeaderSize + ...
         (frameNumber * SeqHeader.TrueImageSize);
+
     fseek(fid,frame_pos,'bof');
-    tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr]);
-    
+
+
+    switch SeqHeader.ImageFormat
+        case 'Monochrome'
+            tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr]);
+        otherwise
+            disp("Cannot read file: " + seq_file_name);
+            error('readNorpixSeqImage:UnknownFormat', ...
+                "Reading image format `" + SeqHeader.ImageFormat + ...
+                "` is NOT implemented yet")
+    end
+
     % max(tmp(:))
     if isempty(tmpImage)
         break
