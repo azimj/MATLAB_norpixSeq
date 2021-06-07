@@ -1,4 +1,4 @@
-function [ imgOut, timestamp ] = readNorpixSeqImage( varargin )
+function [ imgOut, timestamp,timestring ] = readNorpixSeqImage( varargin )
 %READNORPIXSEQIMAGE reads images from a Norpix SEQ file
 %[img,timestamp] = READNORPIXSEQIMAGE(norpixSEQfile,startFrame,endFrame)
 % StartFrame and EndFrame are optional.
@@ -57,24 +57,27 @@ nFrames = frameRange(2)-frameRange(1)+1;
 
 imgOut = cast(zeros(SeqHeader.imageHeight,SeqHeader.imageWidth,nFrames),bitstr);
 
-timestamp(nFrames,1) = "";
+timestamp(nFrames,1) = 0;
 
 %previousFractionSecond = 0;
 %nSeconds = 0;
 
 while nread<nFrames
 
+    %zero based offset of current frame to read
+    %for example reading first frame gives:
+    %   nread=0, frameRange(1)=1, frameNumber=0+1-1=0
     frameNumber = nread + frameRange(1)-1;
     frame_pos = SeqHeader.HeaderSize + ...
-        (frameNumber * SeqHeader.TrueImageSize);
+        ((frameNumber) * SeqHeader.TrueImageSize);
 
     fseek(fid,frame_pos,'bof');
 
 
     switch SeqHeader.ImageFormat
         case {'Monochrome', 'Mono_MSB_Swap'}
-            tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr]);
-        
+            tmpImage = fread(fid, [SeqHeader.imageWidth ,SeqHeader.imageHeight], [bitstr '=>' bitstr])';
+            
             
         otherwise
             disp("Cannot read file: " + seq_file_name);
@@ -82,16 +85,12 @@ while nread<nFrames
                 "Reading image format `" + SeqHeader.ImageFormat + ...
                 "` is NOT implemented yet")
     end
-
-    % max(tmp(:))
-    if isempty(tmpImage)
-        break
-    end
-    imgOut(:,:,nread+1) = tmpImage';
+    
+    imgOut(:,:,nread+1) = tmpImage;
     
     
     timestamp(nread+1,1)=seq.extractTimeStamp(fid);
-
+    
     nread = nread + 1; % Post increment nread
 end
 
