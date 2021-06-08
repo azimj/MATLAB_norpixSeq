@@ -95,7 +95,7 @@ for iFrame = startFrame:skipFrames:endFrame
         case 3 % rgb
             curimage_rgb = curimage;
         otherwise
-            error("frame size: " + num2str(size(fr)) + " does not represent an image");
+            error("frame size: " + num2str(size(curimage)) + " does not represent an image");
     end
     % check if we have dropped frames (and blank frame for each dropped
     % frame)
