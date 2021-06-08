@@ -16,19 +16,29 @@ List of functions provided in the package
 * `readNorpixSeqImage`
 * `readNorpixSeqTimeStamp`
 * `extractTimeStamp`
+* `seq2avi`
 
 ## Usage Examples
 
 ```MATLAB
+% Get File Header data
 header_data=seq.readNorpixHeader(norpix_file_name);
-frame_sequence=seq.readNorpixImage(norpix_file_name,StartFrame,<EndFrame>);
+
+% Read frames from file
+[frame_sequence, frame_time_stamps]=seq.readNorpixImage(norpix_file_name,StartFrame,<EndFrame>);
+
+% Read numeric and string time stamps
 [numericTimeStamp, stringTimeStamp]=seq.readNorpixTimeStamp(norpix_file_name,StartFrame,<EndFrame>;
+
+% Convert SEQ to AVI
+seq2avi(norpix_file_name,'startFrame',1,'endFrame',100, ...
+        'outputFrameRate',30,'videoProfile','Archival')
 ```
 
 ## ToDo
 
 * [ ] Clean up help comments
-* [ ] Create MATLAB deployable toolbox [MATLAB-toobox
+* [ ] Create MATLAB deployable toolbox [MATLAB-toobox]
 
 <!-- Markdown link & img definitions -->
 [norpix]: https://www.norpix.com/
