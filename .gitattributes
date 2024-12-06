@@ -1,2 +1,4 @@
 *.m eol=lf
 *.mlapp -text
+*.md eol=lf
+LICENSE eol=lf
